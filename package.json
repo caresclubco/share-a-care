@@ -2,22 +2,35 @@
   "name": "share-a-care",
   "version": "0.1.0",
   "private": true,
+  "overrides": {
+    "ajv": "6.12.6",
+    "ajv-formats": "1.5.1",
+    "ajv-keywords": "3.5.2"
+  },
   "dependencies": {
+    "@coinbase/onchainkit": "^0.38.8",
+    "@firebasegen/default-connector": "file:dataconnect-generated/js/default-connector",
+    "@reown/walletkit": "^1.2.3",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^13.5.0",
-    "ethers": "^5.7.2",
+    "@walletconnect/core": "^2.20.0",
+    "@walletconnect/utils": "^2.20.0",
+    "ethers": "^5.8.0",
+    "firebase": "^11.6.1",
     "lucide-react": "^0.503.0",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "react-scripts": "5.0.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-scripts": "^5.0.1",
+    "viem": "^2.28.0",
+    "wagmi": "^2.15.0",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test":  "react-scripts test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
