@@ -1,22 +1,16 @@
+// filepath: /Users/frankiecolamarino/share-a-care/.vscode/launch.json
 {
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch Chrome",
+      "name": "Launch Chrome (Port 8080)",
       "request": "launch",
       "type": "chrome",
       "url": "http://localhost:8080",
       "webRoot": "${workspaceFolder}"
     },
     {
-      "name": "Launch Chrome (Port 8080 - Default)",
-      "request": "launch",
-      "type": "chrome",
-      "url": "http://localhost:8080",
-      "webRoot": "${workspaceFolder}"
-    },
-    {
-      "name": "Attach to Chrome",
+      "name": "Attach to Chrome (Port 9222)",
       "port": 9222,
       "request": "attach",
       "type": "chrome",
@@ -24,7 +18,7 @@
     },
     {
       "name": "Launch Chrome (Port 3000)",
-      "type": "pwa-chrome",
+      "type": "chrome", // Changed from "pwa-chrome" to "chrome"
       "request": "launch",
       "url": "http://localhost:3000",
       "webRoot": "${workspaceFolder}/src"
