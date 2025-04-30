@@ -1,19 +1,179 @@
 // src/ShareACareApp.jsx
 import React, { useState, useEffect } from "react";
 import { Bell, User, Home, Heart, Gift, ArrowLeft, Search } from "lucide-react";
-import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { useAdminAuth } from "./hooks/useAdminAuth";
-import { getProjects, getCarePackages, getUserDonations } from "./firebase-db";
-import { initializeOnchainKit } from "@coinbase/onchainkit";
+import {
+  getProjects,
+  getCarePackages,
+  getUserDonations,
+  getTopDonors,
+} from "./firebase-db";
 
-// Initialize OnchainKit for Base Wallet integration
-initializeOnchainKit();
+// SimpleWalletConnector component
+const SimpleWalletConnector = ({ onConnect }) => {
+  const [address, setAddress] = useState(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const [error, setError] = useState(null);
+
+  // Check if ethereum provider exists
+  const checkEthereumProvider = () => {
+    return (
+      typeof window !== "undefined" &&
+      (window.ethereum || window.coinbaseWalletExtension)
+    );
+  };
+
+  // Get the appropriate provider
+  const getProvider = () => {
+    if (window.coinbaseWalletExtension) {
+      return window.coinbaseWalletExtension;
+    }
+    return window.ethereum;
+  };
+
+  // Format address for display
+  const formatAddress = (addr) => {
+    if (!addr) return "";
+    return `${addr.substring(0, 6)}...${addr.substring(addr.length - 4)}`;
+  };
+
+  // Connect wallet using window.ethereum
+  const connectWallet = async () => {
+    setError(null);
+
+    if (!checkEthereumProvider()) {
+      setError(
+        "No Ethereum wallet found. Please install MetaMask or Coinbase Wallet."
+      );
+      return;
+    }
+
+    try {
+      // Request accounts from the appropriate provider
+      const provider = getProvider();
+      const accounts = await provider.request({
+        method: "eth_requestAccounts",
+      });
+
+      if (accounts && accounts.length > 0) {
+        setAddress(accounts[0]);
+        setIsConnected(true);
+        if (onConnect) {
+          onConnect(accounts[0]);
+        }
+      }
+    } catch (err) {
+      console.error("Error connecting wallet:", err);
+      setError("Failed to connect wallet. Please try again.");
+    }
+  };
+
+  // Disconnect wallet (just resets state - doesn't disconnect from provider)
+  const disconnectWallet = () => {
+    setAddress(null);
+    setIsConnected(false);
+    if (onConnect) {
+      onConnect(null);
+    }
+  };
+
+  // Function to launch Coinbase Wallet
+  const launchCoinbaseWallet = () => {
+    // Deep link to Coinbase Wallet
+    window.location.href = `https://go.cb-w.com/dapp?cb_url=${encodeURIComponent(
+      window.location.href
+    )}`;
+  };
+
+  // Handle account changes
+  useEffect(() => {
+    if (checkEthereumProvider()) {
+      const provider = getProvider();
+
+      const handleAccountsChanged = (accounts) => {
+        if (accounts.length === 0) {
+          // User disconnected their wallet
+          setAddress(null);
+          setIsConnected(false);
+          if (onConnect) {
+            onConnect(null);
+          }
+        } else if (accounts[0] !== address) {
+          // User switched accounts
+          setAddress(accounts[0]);
+          setIsConnected(true);
+          if (onConnect) {
+            onConnect(accounts[0]);
+          }
+        }
+      };
+
+      provider.on("accountsChanged", handleAccountsChanged);
+
+      // Check if already connected
+      provider
+        .request({ method: "eth_accounts" })
+        .then((accounts) => {
+          if (accounts && accounts.length > 0) {
+            setAddress(accounts[0]);
+            setIsConnected(true);
+            if (onConnect) {
+              onConnect(accounts[0]);
+            }
+          }
+        })
+        .catch((err) => console.error("Error checking accounts:", err));
+
+      return () => {
+        if (provider && provider.removeListener) {
+          provider.removeListener("accountsChanged", handleAccountsChanged);
+        }
+      };
+    }
+  }, [address, onConnect]);
+
+  if (isConnected && address) {
+    return (
+      <div className="flex items-center space-x-2 bg-gray-100 rounded-full px-3 py-1">
+        <div className="w-6 h-6 rounded-full bg-red-600 flex items-center justify-center overflow-hidden">
+          <User size={14} className="text-white" />
+        </div>
+        <span className="text-sm font-medium">{formatAddress(address)}</span>
+        <button
+          onClick={disconnectWallet}
+          className="text-xs text-gray-500 hover:text-gray-700"
+        >
+          Disconnect
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col space-y-2">
+      <div className="flex space-x-2">
+        <button
+          className="bg-red-600 text-white px-3 py-1 rounded-full text-sm"
+          onClick={connectWallet}
+        >
+          Connect Wallet
+        </button>
+        <button
+          className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm"
+          onClick={launchCoinbaseWallet}
+        >
+          Coinbase Wallet
+        </button>
+      </div>
+      {error && <div className="text-red-500 text-xs mt-1">{error}</div>}
+    </div>
+  );
+};
 
 // Main App Component
 const ShareACareApp = () => {
-  const { address, isConnected } = useAccount();
-  const { connect, connectors } = useConnect();
-  const { disconnect } = useDisconnect();
+  const [address, setAddress] = useState(null);
+  const [isConnected, setIsConnected] = useState(false);
   const { isAdmin } = useAdminAuth();
 
   const [currentPage, setCurrentPage] = useState("home");
@@ -25,6 +185,12 @@ const ShareACareApp = () => {
   const [isExplainerCollapsed, setIsExplainerCollapsed] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Handle wallet connection
+  const handleWalletConnection = (walletAddress) => {
+    setAddress(walletAddress);
+    setIsConnected(!!walletAddress);
+  };
 
   // Fetch initial data
   useEffect(() => {
@@ -49,7 +215,7 @@ const ShareACareApp = () => {
       const [projectsData, packagesData, donorsData] = await Promise.all([
         getProjects(),
         getCarePackages(),
-        getTopDonors(5), // Assuming you have this function
+        getTopDonors(5),
       ]);
 
       setProjects(projectsData);
@@ -71,19 +237,6 @@ const ShareACareApp = () => {
       setUserDonations(donations);
     } catch (err) {
       console.error("Error fetching user data:", err);
-    }
-  };
-
-  // Connect wallet function using wagmi
-  const connectWallet = async () => {
-    try {
-      // Find the first available connector (usually injected - MetaMask)
-      const connector = connectors[0];
-      if (connector && connector.ready) {
-        await connect({ connector });
-      }
-    } catch (err) {
-      console.error("Error connecting wallet:", err);
     }
   };
 
@@ -121,23 +274,7 @@ const ShareACareApp = () => {
           </div>
           <div className="flex items-center space-x-4">
             <Bell size={20} />
-            {isConnected ? (
-              <div className="flex items-center space-x-2 bg-gray-100 rounded-full px-3 py-1">
-                <div className="w-6 h-6 rounded-full bg-red-600 flex items-center justify-center overflow-hidden">
-                  <User size={14} className="text-white" />
-                </div>
-                <span className="text-sm font-medium">
-                  {formatAddress(address)}
-                </span>
-              </div>
-            ) : (
-              <button
-                className="bg-red-600 text-white px-3 py-1 rounded-full text-sm"
-                onClick={connectWallet}
-              >
-                Connect Wallet
-              </button>
-            )}
+            <SimpleWalletConnector onConnect={handleWalletConnection} />
           </div>
         </div>
 
@@ -338,12 +475,7 @@ const ShareACareApp = () => {
           <p className="text-gray-600 mb-6">
             Connect your wallet to view your profile, donations, and rewards.
           </p>
-          <button
-            onClick={connectWallet}
-            className="bg-red-600 text-white px-6 py-3 rounded-full"
-          >
-            Connect Wallet
-          </button>
+          <SimpleWalletConnector onConnect={handleWalletConnection} />
         </div>
       );
     }
@@ -446,18 +578,7 @@ const ShareACareApp = () => {
           )}
 
           <div className="mt-6">
-            <button
-              onClick={connectWallet}
-              className="w-full bg-red-600 text-white py-3 rounded-full"
-            >
-              Connect Wallet
-            </button>
-            <button
-              onClick={disconnect}
-              className="w-full bg-white border border-red-600 text-red-600 py-3 rounded-full mt-3"
-            >
-              Disconnect Wallet
-            </button>
+            <SimpleWalletConnector onConnect={handleWalletConnection} />
           </div>
         </div>
       </div>
