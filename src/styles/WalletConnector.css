@@ -1,0 +1,47 @@
+@import "./variables.css";
+
+.wallet-connector {
+  display: flex;
+  align-items: center;
+}
+
+.connect-wallet-btn {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: var(--spacing-2) var(--spacing-4);
+  border-radius: 999px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.connect-wallet-btn:hover {
+  background-color: var(--primary-dark);
+}
+
+.wallet-connected {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.wallet-address {
+  background-color: var(--neutral-100);
+  color: var(--neutral-800);
+  padding: var(--spacing-1) var(--spacing-3);
+  border-radius: 999px;
+  font-size: 0.875rem;
+}
+
+.disconnect-wallet-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary-color);
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.disconnect-wallet-btn:hover {
+  color: var(--primary-color);
+}

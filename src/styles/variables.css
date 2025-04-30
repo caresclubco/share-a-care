@@ -1,0 +1,83 @@
+:root {
+  /* Main colors */
+  --primary-color: #ff5a5f; /* Red accent */
+  --primary-light: #ff8a8f;
+  --primary-dark: #e03a3f;
+  --secondary-color: #ffd166; /* Yellow accent */
+  --secondary-light: #ffdf8f;
+  --secondary-dark: #eab000;
+
+  /* Dark mode colors */
+  --dark-bg: #121212;
+  --dark-surface: #1e1e1e;
+  --dark-border: #333333;
+  --dark-text: #e0e0e0;
+  --dark-text-secondary: #aaaaaa;
+
+  /* Light mode colors */
+  --light-bg: #f9f9f9;
+  --light-surface: #ffffff;
+  --light-border: #e5e5e5;
+  --light-text: #333333;
+  --light-text-secondary: #666666;
+
+  /* Neutral colors */
+  --neutral-50: #f9fafb;
+  --neutral-100: #f3f4f6;
+  --neutral-200: #e5e7eb;
+  --neutral-300: #d1d5db;
+  --neutral-400: #9ca3af;
+  --neutral-500: #6b7280;
+  --neutral-600: #4b5563;
+  --neutral-700: #374151;
+  --neutral-800: #1f2937;
+  --neutral-900: #111827;
+
+  /* Feedback colors */
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --error-color: #ef4444;
+  --info-color: #3b82f6;
+
+  /* Spacing */
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --spacing-3: 0.75rem;
+  --spacing-4: 1rem;
+  --spacing-5: 1.25rem;
+  --spacing-6: 1.5rem;
+  --spacing-8: 2rem;
+  --spacing-10: 2.5rem;
+  --spacing-12: 3rem;
+
+  /* Layout */
+  --sidebar-width: 250px;
+  --sidebar-collapsed-width: 64px;
+  --header-height: 64px;
+
+  /* Borders and shadows */
+  --border-radius-sm: 0.25rem;
+  --border-radius-md: 0.5rem;
+  --border-radius-lg: 0.75rem;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark mode class for body */
+body.dark-mode {
+  --bg-color: var(--dark-bg);
+  --surface-color: var(--dark-surface);
+  --border-color: var(--dark-border);
+  --text-color: var(--dark-text);
+  --text-secondary-color: var(--dark-text-secondary);
+}
+
+/* Light mode (default) */
+body {
+  --bg-color: var(--light-bg);
+  --surface-color: var(--light-surface);
+  --border-color: var(--light-border);
+  --text-color: var(--light-text);
+  --text-secondary-color: var(--light-text-secondary);
+}
