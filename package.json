@@ -10,7 +10,7 @@
     "ajv-keywords": "5.1.0"
   },
   "dependencies": {
-    "@coinbase/onchainkit": "^0.38.8",
+    "@coinbase/onchainkit": "^0.38.9",
     "@firebasegen/default-connector": "file:dataconnect-generated/js/default-connector",
     "@reown/walletkit": "^1.2.3",
     "@testing-library/dom": "^10.4.0",
